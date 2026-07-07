@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 from PIL import Image as PILImage
+import logging
 
 from mediapipe.tasks.python.vision import (
     FaceDetector as MPFaceDetector,
@@ -8,6 +9,8 @@ from mediapipe.tasks.python.vision import (
     RunningMode,
 )
 from mediapipe.tasks.python.core.base_options import BaseOptions
+
+logger = logging.getLogger(__name__)
 
 IMAGE_EXTENSIONS = {
     '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp',
@@ -17,10 +20,11 @@ IMAGE_EXTENSIONS = {
 
 MODEL_PATH = Path(__file__).parent / 'face_detection.tflite'
 
+# Umbral más bajo para detectar más rostros (incluso parciales)
 _options = FaceDetectorOptions(
     base_options=BaseOptions(model_asset_path=str(MODEL_PATH)),
     running_mode=RunningMode.IMAGE,
-    min_detection_confidence=0.3,
+    min_detection_confidence=0.15,  # Aumentado sensibilidad: 0.3 → 0.15
 )
 _detector = MPFaceDetector.create_from_options(_options)
 
@@ -66,15 +70,15 @@ def detect_faces_in_image(image_path):
 
     faces = []
     h, w, _ = bgr.shape
-    MARGIN_FACTOR = 0.2
+    MARGIN_FACTOR = 0.25  # Margen más grande: 0.2 → 0.25
 
     raw_detections = []
     for detection in detections.detections:
         bbox = detection.bounding_box
-        x = bbox.origin_x
-        y = bbox.origin_y
-        bw = bbox.width
-        bh = bbox.height
+        x = int(bbox.origin_x * w)
+        y = int(bbox.origin_y * h)
+        bw = int(bbox.width * w)
+        bh = int(bbox.height * h)
 
         mx = int(bw * MARGIN_FACTOR)
         my = int(bh * MARGIN_FACTOR)
@@ -83,15 +87,20 @@ def detect_faces_in_image(image_path):
         bw = min(w - x, bw + 2 * mx)
         bh = min(h - y, bh + 2 * my)
 
+        if bw < 10 or bh < 10:  # Ignora rostros muy pequeños
+            continue
+
         face_crop = bgr[y:y + bh, x:x + bw]
         if face_crop.size == 0:
             continue
 
         raw_detections.append({
             "bbox": (x, y, bw, bh),
-            "crop": face_crop
+            "crop": face_crop,
+            "confidence": detection.categories[0].score if detection.categories else 1.0
         })
 
+    # Deduplicación menos agresiva
     keep = []
     for i, a in enumerate(raw_detections):
         x1, y1, w1, h1 = a["bbox"]
@@ -106,13 +115,14 @@ def detect_faces_in_image(image_path):
                 inter = wi * hi
                 union = w1 * h1 + w2 * h2 - inter
                 iou = inter / union if union > 0 else 0
-                if iou > 0.5:
+                if iou > 0.35:  # Umbral más bajo: 0.5 → 0.35
                     is_duplicate = True
                     break
         if not is_duplicate:
             keep.append(i)
 
     faces = [raw_detections[i] for i in keep]
+    logger.info(f"{image_path}: {len(faces)} rostro(s) detectado(s)")
     return faces, None
 
 
@@ -126,6 +136,8 @@ def process_folder(folder_path):
     results = []
     no_face_images = []
     errors = []
+
+    logger.info(f"Procesando {len(image_paths)} imagen(es)...")
 
     for img_path in image_paths:
         try:
@@ -142,6 +154,10 @@ def process_folder(folder_path):
                 })
         except Exception as e:
             errors.append(f"{img_path}: {e}")
+            logger.error(f"Error procesando {img_path}: {e}")
             continue
+
+    logger.info(f"Resultados: {len(results)} imagen(es) con rostro(s), "
+                f"{len(no_face_images)} sin rostro(s), {len(errors)} error(es)")
 
     return results, no_face_images, errors
