@@ -3,3 +3,7 @@ mediapipe
 opencv-python
 numpy
 flask
+torch
+torchvision
+facenet-pytorch
+scipy
