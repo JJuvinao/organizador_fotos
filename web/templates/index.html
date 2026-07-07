@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Fotos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Organizador de Fotos</h1>
+        <p class="subtitle">Agrupa tus fotos por reconocimiento facial</p>
+
+        <div class="upload-area">
+            <div class="path-input-group">
+                <input type="text" id="folderPath" placeholder="Ej: C:\Users\..." class="path-input">
+                <button id="btnScan" class="btn-scan">Analizar</button>
+            </div>
+        </div>
+
+        <div id="scanInfo" class="scan-info hidden"></div>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p id="loadingText">Procesando imágenes...</p>
+        </div>
+
+        <div id="result" class="result hidden">
+            <div class="result-header">
+                <span class="result-icon">&#10003;</span>
+                <h2>Organización completada</h2>
+            </div>
+            <div class="result-stats">
+                <div class="stat">
+                    <span class="stat-number" id="totalFotos">0</span>
+                    <span class="stat-label">fotos procesadas</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="totalPersonas">0</span>
+                    <span class="stat-label">personas detectadas</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="totalSinRostro">0</span>
+                    <span class="stat-label">sin rostro</span>
+                </div>
+            </div>
+            <div class="result-folders">
+                <h3>Carpetas creadas:</h3>
+                <ul id="folderList"></ul>
+            </div>
+            <p class="output-path">Guardado en: <strong id="outputPath">{{ output_path }}</strong></p>
+            <p class="note">Si una foto tiene varias personas, aparecerá en la carpeta de cada una.</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

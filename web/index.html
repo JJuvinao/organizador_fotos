@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Fotos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Organizador de Fotos</h1>
+        <p class="subtitle">Selecciona una carpeta para contar las fotos</p>
+
+        <div class="upload-area">
+            <label for="folderInput" class="btn-select">Seleccionar carpeta</label>
+            <input type="file" id="folderInput" webkitdirectory multiple hidden>
+            <p class="hint">O haz clic en el botón y elige una carpeta</p>
+        </div>
+
+        <div id="result" class="result hidden">
+            <span id="countDisplay">0</span>
+            <span id="countLabel">fotos encontradas</span>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
