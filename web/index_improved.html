@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Fotos - Mejorado</title>
+    <link rel="stylesheet" href="css/style_improved.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🎯 Organizador de Fotos Inteligente</h1>
+            <p class="subtitle">Detección de rostros con Deep Learning + Correcciones manuales</p>
+        </header>
+
+        <!-- PASO 1: SELECCIONAR CARPETA -->
+        <section id="step1" class="step active">
+            <div class="step-header">
+                <span class="step-number">1</span>
+                <h2>Seleccionar Carpeta</h2>
+            </div>
+
+            <div class="upload-area">
+                <label for="folderInput" class="btn-primary">📁 Seleccionar carpeta</label>
+                <input type="file" id="folderInput" webkitdirectory multiple hidden>
+                <p class="hint">O arrastra una carpeta aquí</p>
+            </div>
+
+            <div id="folderPath" class="info-box hidden">
+                <strong>📂 Carpeta seleccionada:</strong>
+                <p id="folderPathText"></p>
+            </div>
+
+            <div id="error1" class="error hidden"></div>
+        </section>
+
+        <!-- PASO 2: PROCESAMIENTO -->
+        <section id="step2" class="step">
+            <div class="step-header">
+                <span class="step-number">2</span>
+                <h2>Procesamiento</h2>
+            </div>
+
+            <div class="controls">
+                <label>Calidad mínima de rostro:</label>
+                <input type="range" id="qualitySlider" min="0.1" max="0.9" step="0.1" value="0.3">
+                <span id="qualityValue">0.3</span>
+            </div>
+
+            <button id="processBtn" class="btn-primary" disabled>🚀 Procesar Fotos</button>
+
+            <div id="progress" class="progress hidden">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="progressText">Detectando rostros...</p>
+            </div>
+
+            <div id="error2" class="error hidden"></div>
+        </section>
+
+        <!-- PASO 3: REVISIÓN Y CORRECCIONES -->
+        <section id="step3" class="step">
+            <div class="step-header">
+                <span class="step-number">3</span>
+                <h2>Revisión y Correcciones</h2>
+            </div>
+
+            <div id="resultsContainer" class="results-container hidden">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPhotos">0</div>
+                        <div class="stat-label">Fotos totales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPeople">0</div>
+                        <div class="stat-label">Personas detectadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="withFace">0</div>
+                        <div class="stat-label">Con rostro</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="noFace">0</div>
+                        <div class="stat-label">Sin rostro</div>
+                    </div>
+                </div>
+
+                <div class="persons-grid" id="personsGrid"></div>
+
+                <div class="action-buttons">
+                    <button id="finalizeBtn" class="btn-success">✅ Finalizar Organización</button>
+                    <button id="startOverBtn" class="btn-secondary">🔄 Comenzar de nuevo</button>
+                </div>
+            </div>
+
+            <div id="error3" class="error hidden"></div>
+        </section>
+
+        <!-- PASO 4: FINALIZADO -->
+        <section id="step4" class="step">
+            <div class="step-header">
+                <span class="step-number">4</span>
+                <h2>¡Listo!</h2>
+            </div>
+
+            <div id="successMessage" class="success-box hidden">
+                <h3>✨ Fotos organizadas exitosamente</h3>
+                <p>Las fotos han sido organizadas por persona en:</p>
+                <p id="outputPath" class="highlight"></p>
+                <button id="openFolderBtn" class="btn-primary">📂 Abrir carpeta</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- MODAL: Detalles de Persona -->
+    <div id="personModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="modalPersonName"></h2>
+            <div id="modalPersonStats" class="modal-stats"></div>
+            <div id="modalPersonImages" class="modal-images"></div>
+            <div class="modal-actions">
+                <button id="mergeSplitBtn" class="btn-secondary">✂️ Dividir o Fusionar</button>
+                <button id="modalCloseBtn" class="btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main_improved.js"></script>
+</body>
+</html>
